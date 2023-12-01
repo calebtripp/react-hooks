@@ -16,6 +16,8 @@ function PokemonInfo({pokemonName}) {
     error: null,
   })
 
+  // const {status, pokemon, error} = state - this alis another way of doing it, potentially preventing less changes in var names down the line.
+
   React.useEffect(() => {
     if (!pokemonName) {
       return
