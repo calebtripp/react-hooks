@@ -12,35 +12,41 @@ import {
 function PokemonInfo({pokemonName}) {
   const [pokemon, setPokemon] = React.useState(null)
   const [error, setError] = React.useState(null)
+  const [status, setStatus] = React.useState('idle')
 
   React.useEffect(() => {
     if (!pokemonName) {
       return
     }
-    setPokemon(null)
-    setError(null)
+    setStatus('pending')
+
     fetchPokemon(pokemonName)
-      .then(pokemon => setPokemon(pokemon))
-      .catch(error => setError(error))
+      .then(pokemon => {
+        setPokemon(pokemon)
+        setStatus('resolved')
+      })
+      .catch(error => {
+        setError(error)
+        setStatus('rejected')
+      })
   }, [pokemonName])
 
-  if (error) {
+  if (status === 'rejected') {
     return (
       <div role="alert">
         There was an error:{' '}
         <pre style={{whiteSpace: 'normal'}}>{error.message}</pre>
       </div>
     )
-  }
-  if (!pokemonName) {
+  } else if (status === 'idle') {
     return 'Submit a Pokemon'
-  }
-  if (pokemonName && !pokemon) {
+  } else if (status === 'pending') {
     return <PokemonInfoFallback name={pokemonName} />
-  }
-  if (pokemon) {
+  } else if (status === 'resolved') {
     return <PokemonDataView pokemon={pokemon} />
   }
+
+  throw new Error('this should never happen')
 }
 
 function App() {
